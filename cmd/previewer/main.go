@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -28,7 +29,18 @@ func main() {
 	}
 
 	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	err := config.Read(configFile)
+	if err != nil {
+		log.Fatalln("failed to read config: " + err.Error())
+	}
+
+	f, err := os.OpenFile("calendar_logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
+	if err != nil {
+		log.Fatalln("error opening file: " + err.Error())
+	}
+	defer f.Close()
+
+	logg := logger.New(config.Logger.Level, f)
 
 	previewer := app.New(logg)
 
