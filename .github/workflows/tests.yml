@@ -1,0 +1,50 @@
+name: Previewer images tests
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  GO111MODULE: "on"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ~1.17
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Linters
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.41.1
+          working-directory: .
+
+  tests_by_makefile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ^1.16
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: make lint
+        run: make lint
+        working-directory: hw12_13_14_15_calendar
+
+      - name: make build
+        run: make build
+        working-directory: hw12_13_14_15_calendar
+
+      - name: make test
+        run: make test
+        working-directory: hw12_13_14_15_calendar
