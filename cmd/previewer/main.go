@@ -10,7 +10,7 @@ import (
 
 	"github.com/julinserg/go_home_project/internal/app"
 	"github.com/julinserg/go_home_project/internal/logger"
-	internalhttp "github.com/julinserg/go_home_project/internal/server"
+	internalhttp "github.com/julinserg/go_home_project/internal/server/http"
 )
 
 var configFile string
