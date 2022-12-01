@@ -1,3 +1,4 @@
+![GitHub CI](https://github.com/julinserg/go_home_project/actions/workflows/tests.yml/badge.svg)
 # Cервис "Превьювер изображений"
 
 ## Общее описание
