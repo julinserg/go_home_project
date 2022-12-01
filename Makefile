@@ -17,9 +17,9 @@ down:
 
 version: build
 	$(BIN_CND) version
-	
+
 test:
-	go test -race ./...
+	go test -race -count 100 ./...
 
 integration-tests:
 	set -e ;\

@@ -1,1 +1,16 @@
 version: "3"
+
+services:
+  previewer_service:
+    build:
+      context: ../
+      dockerfile: ./build/Dockerfile-previewer
+    image: previewer_service_docker_image    
+    volumes:
+      - ../configs/config-docker.toml:/etc/previewer/config.toml:ro
+
+    restart: on-failure
+    ports:
+      - "8088:8088"  
+    expose:
+      - 8088

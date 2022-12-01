@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"log"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
@@ -44,7 +45,8 @@ func main() {
 
 	previewer := app.New(logg)
 
-	server := internalhttp.NewServer(logg, previewer)
+	endpoint := net.JoinHostPort(config.HTTP.Host, config.HTTP.Port)
+	server := internalhttp.NewServer(logg, previewer, endpoint)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
