@@ -35,7 +35,7 @@ func main() {
 		log.Fatalln("failed to read config: " + err.Error())
 	}
 
-	f, err := os.OpenFile("calendar_logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
+	f, err := os.OpenFile("previewer.logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
 	if err != nil {
 		log.Fatalln("error opening file: " + err.Error())
 	}
