@@ -1,4 +1,4 @@
-name: Previewer images tests
+name: PreviewerImages CI
 
 on:
   push:
