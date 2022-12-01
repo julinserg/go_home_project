@@ -1,4 +1,4 @@
-name: PreviewerImages CI
+name: Previewer CI
 
 on:
   push:
