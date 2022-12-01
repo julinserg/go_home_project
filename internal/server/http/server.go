@@ -6,8 +6,7 @@ import (
 	"net/http"
 )
 
-type Application interface {
-}
+type Application interface{}
 
 type Server struct {
 	server   *http.Server

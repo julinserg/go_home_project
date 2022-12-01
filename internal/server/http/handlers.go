@@ -1,6 +1,7 @@
 package internalhttp
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -9,9 +10,9 @@ import (
 )
 
 var (
-	ErrNotSetWidthOrHeights = errors.New("Not set width or height in URL")
-	ErrWidthNotInt          = errors.New("Width in URL not integer")
-	ErrHeightNotInt         = errors.New("Height in URL not integer")
+	ErrNotSetWidthOrHeights = errors.New("not set width or height in URL")
+	ErrWidthNotInt          = errors.New("width in URL not integer")
+	ErrHeightNotInt         = errors.New("height in URL not integer")
 )
 
 type previewerHandler struct {
@@ -31,34 +32,33 @@ func (ph *previewerHandler) sendError(err error, code int, w http.ResponseWriter
 }
 
 func (ph *previewerHandler) mainHandler(w http.ResponseWriter, r *http.Request) {
-
-	splitUrl := strings.Split(r.URL.Path, "/")
-	if len(splitUrl) < 3 {
+	splitURL := strings.Split(r.URL.Path, "/")
+	if len(splitURL) < 3 {
 		ph.sendError(ErrNotSetWidthOrHeights, http.StatusBadRequest, w)
 		return
 	}
-	splitUrlParam := splitUrl[2:len(splitUrl)]
+	splitURLParam := splitURL[2:]
 
-	if len(splitUrlParam) < 3 {
+	if len(splitURLParam) < 3 {
 		ph.sendError(ErrNotSetWidthOrHeights, http.StatusBadRequest, w)
 		return
 	}
-	width, err := strconv.Atoi(splitUrlParam[0])
+	width, err := strconv.Atoi(splitURLParam[0])
 	if err != nil {
 		ph.sendError(ErrWidthNotInt, http.StatusBadRequest, w)
 		return
 	}
 
-	height, err := strconv.Atoi(splitUrlParam[1])
+	height, err := strconv.Atoi(splitURLParam[1])
 	if err != nil {
 		ph.sendError(ErrHeightNotInt, http.StatusBadRequest, w)
 		return
 	}
 
-	imageUrl := strings.Join(splitUrlParam[2:len(splitUrlParam)], "/")
+	imageURL := strings.Join(splitURLParam[2:], "/")
 
 	client := http.Client{}
-	req, err := http.NewRequest("GET", "http://"+imageUrl, nil)
+	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://"+imageURL, nil)
 	if err != nil {
 		ph.sendError(ErrHeightNotInt, http.StatusInternalServerError, w)
 		return
@@ -70,6 +70,7 @@ func (ph *previewerHandler) mainHandler(w http.ResponseWriter, r *http.Request) 
 		ph.sendError(ErrHeightNotInt, http.StatusBadRequest, w)
 		return
 	}
+	defer res.Body.Close()
 
 	_ = width
 	_ = height

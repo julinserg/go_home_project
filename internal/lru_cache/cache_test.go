@@ -1,7 +1,8 @@
 package lrucache
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"strconv"
 	"sync"
 	"testing"
@@ -133,7 +134,11 @@ func TestCacheMultithreading(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for i := 0; i < 1_000_000; i++ {
-			c.Get(Key(strconv.Itoa(rand.Intn(1_000_000))))
+			nBig, err := rand.Int(rand.Reader, big.NewInt(1_000_000))
+			if err != nil {
+				return
+			}
+			c.Get(Key(strconv.FormatInt(nBig.Int64(), 10)))
 		}
 	}()
 
