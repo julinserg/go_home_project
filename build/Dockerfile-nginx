@@ -1,0 +1,4 @@
+# На выходе тонкий образ
+FROM nginx
+
+COPY ./build/images /usr/share/nginx/html/images
