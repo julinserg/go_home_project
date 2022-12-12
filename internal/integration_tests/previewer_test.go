@@ -1,4 +1,4 @@
-package previewer_integration_tests
+package previewerintegrationtests
 
 import (
 	"bytes"
@@ -11,12 +11,6 @@ import (
 	"github.com/cucumber/godog"
 )
 
-func panicOnErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 type previewerTest struct {
 	responseStatusCode int
 	responseBody       []byte
@@ -27,7 +21,8 @@ func (test *previewerTest) iSendRequestTo(httpMethod, addr string) (err error) {
 
 	switch httpMethod {
 	case http.MethodGet:
-		r, err = http.Get(addr)
+		r, err = http.Get(addr) //nolint:gosec,noctx
+		defer r.Body.Close()
 	default:
 		err = fmt.Errorf("unknown method: %s", httpMethod)
 	}
@@ -37,6 +32,7 @@ func (test *previewerTest) iSendRequestTo(httpMethod, addr string) (err error) {
 	}
 	test.responseStatusCode = r.StatusCode
 	test.responseBody, err = ioutil.ReadAll(r.Body)
+
 	return
 }
 
@@ -85,5 +81,4 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^The response should match text "([^"]*)"$`, test.theResponseShouldMatchText)
 	s.Step(`^The response should match text$`, test.theResponseShouldMatchTextMultiLine)
 	s.Step(`^Compare with image "([^"]*)"$`, test.compareWithImage)
-
 }

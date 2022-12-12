@@ -1,4 +1,4 @@
-package previewer_integration_tests
+package previewerintegrationtests
 
 import (
 	"log"

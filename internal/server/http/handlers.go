@@ -84,7 +84,11 @@ func (ph *previewerHandler) validateInputParameter(url string, w http.ResponseWr
 	return true, inputParams{width, height, imageURL}
 }
 
-func (ph *previewerHandler) getImageFromRemoteServer(imageURL string, header http.Header, w http.ResponseWriter) (bool, []byte) {
+func (ph *previewerHandler) getImageFromRemoteServer(
+	imageURL string,
+	header http.Header,
+	w http.ResponseWriter,
+) (bool, []byte) {
 	client := http.Client{}
 	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://"+imageURL, nil)
 	if err != nil {
@@ -112,7 +116,12 @@ func (ph *previewerHandler) getImageFromRemoteServer(imageURL string, header htt
 	return true, bodyBytes
 }
 
-func (ph *previewerHandler) cropAndResizeImage(imageRaw []byte, width int, height int, w http.ResponseWriter) (bool, []byte) {
+func (ph *previewerHandler) cropAndResizeImage(
+	imageRaw []byte,
+	width int,
+	height int,
+	w http.ResponseWriter,
+) (bool, []byte) {
 	readerJpeg := bytes.NewReader(imageRaw)
 	img, err := jpeg.Decode(readerJpeg)
 	if err != nil {
@@ -122,9 +131,8 @@ func (ph *previewerHandler) cropAndResizeImage(imageRaw []byte, width int, heigh
 
 	srcX := img.Bounds().Dx()
 	srcY := img.Bounds().Dy()
-	srcP := srcX / srcY
-	dstP := width / height
-	if srcP != dstP {
+
+	if srcX/srcY != width/height {
 		dstX := srcY * width / height
 		dstY := srcX * height / width
 		img, err = cutter.Crop(img, cutter.Config{
@@ -132,6 +140,10 @@ func (ph *previewerHandler) cropAndResizeImage(imageRaw []byte, width int, heigh
 			Height: dstY,
 			Mode:   cutter.Centered,
 		})
+		if err != nil {
+			ph.sendError(err, http.StatusInternalServerError, w)
+			return false, nil
+		}
 	}
 	resizeImage := resize.Resize(uint(width), uint(height), img, resize.Lanczos3)
 
