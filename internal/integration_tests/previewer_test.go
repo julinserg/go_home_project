@@ -54,6 +54,13 @@ func (test *previewerTest) theResponseShouldMatchText(text string) error {
 	return nil
 }
 
+func (test *previewerTest) theResponseShouldMatchTextMultiLine(text string) error {
+	if string(test.responseBody) != text {
+		return fmt.Errorf("unexpected text: %s != %s", test.responseBody, text)
+	}
+	return nil
+}
+
 func (test *previewerTest) compareWithImage(filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -76,6 +83,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^I send "([^"]*)" request to "([^"]*)"$`, test.iSendRequestTo)
 	s.Step(`^The response code should be (\d+)$`, test.theResponseCodeShouldBe)
 	s.Step(`^The response should match text "([^"]*)"$`, test.theResponseShouldMatchText)
+	s.Step(`^The response should match text$`, test.theResponseShouldMatchTextMultiLine)
 	s.Step(`^Compare with image "([^"]*)"$`, test.compareWithImage)
 
 }
