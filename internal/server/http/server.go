@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/julinserg/go_home_project/internal/app"
 )
@@ -39,8 +40,9 @@ func NewServer(logger Logger, app Application, endpoint string) *Server {
 	mux := http.NewServeMux()
 
 	server := &http.Server{
-		Addr:    endpoint,
-		Handler: loggingMiddleware(mux, logger),
+		Addr:              endpoint,
+		Handler:           loggingMiddleware(mux, logger),
+		ReadHeaderTimeout: 3 * time.Second,
 	}
 	ch := previewerHandler{logger, app}
 	mux.HandleFunc("/", ch.hellowHandler)
