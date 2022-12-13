@@ -32,13 +32,13 @@ func main() {
 	config := NewConfig()
 	err := config.Read(configFile)
 	if err != nil {
-		log.Println("failed to read config: " + err.Error())
+		log.Println("error read config: " + err.Error())
 		return
 	}
 
 	f, err := os.OpenFile("previewer.logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
 	if err != nil {
-		log.Println("error opening file: " + err.Error())
+		log.Println("error opening logfile: " + err.Error())
 		return
 	}
 	defer f.Close()
@@ -52,7 +52,7 @@ func main() {
 	}
 	defer os.RemoveAll(dname)
 
-	logg.Info("created temp dir for cache pictire: " + dname)
+	logg.Info("temp dir for cache pictures is created: " + dname)
 
 	previewer := app.New(logg, config.LRUCache.Size, dname)
 
@@ -74,7 +74,7 @@ func main() {
 		}
 	}()
 
-	logg.Info("previewer is running...")
+	logg.Info("previewer pictures is running...")
 
 	if err := server.Start(ctx); err != nil {
 		logg.Error("failed to start http server: " + err.Error())
