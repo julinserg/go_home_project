@@ -121,7 +121,7 @@ func (a *App) readImageFromDisk(pathToFile string) ([]byte, error) {
 func (a *App) GetImagePreview(params InputParams, header http.Header) ([]byte, int, error) {
 	_, ok := a.cache.Get(params.key())
 	if ok {
-		image, err := a.readImageFromDisk(string(params.key()))
+		image, err := a.readImageFromDisk(filepath.Join(a.tempCacheDir, string(params.key())))
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
