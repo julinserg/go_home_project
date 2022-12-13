@@ -32,18 +32,29 @@ func main() {
 	config := NewConfig()
 	err := config.Read(configFile)
 	if err != nil {
-		log.Fatalln("failed to read config: " + err.Error())
+		log.Println("failed to read config: " + err.Error())
+		return
 	}
 
 	f, err := os.OpenFile("previewer.logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o666)
 	if err != nil {
-		log.Fatalln("error opening file: " + err.Error())
+		log.Println("error opening file: " + err.Error())
+		return
 	}
 	defer f.Close()
 
 	logg := logger.New(config.Logger.Level, f)
 
-	previewer := app.New(logg)
+	dname, err := os.MkdirTemp("", "previewercachedir")
+	if err != nil {
+		log.Println("error create temp dir for cache: " + err.Error())
+		return
+	}
+	defer os.RemoveAll(dname)
+
+	logg.Info("created temp dir for cache pictire: " + dname)
+
+	previewer := app.New(logg, config.LRUCache.Size, dname)
 
 	endpoint := net.JoinHostPort(config.HTTP.Host, config.HTTP.Port)
 	server := internalhttp.NewServer(logg, previewer, endpoint)

@@ -6,8 +6,9 @@ import "github.com/BurntSushi/toml"
 // Организация конфига в main принуждает нас сужать API компонентов, использовать
 // при их конструировании только необходимые параметры, а также уменьшает вероятность циклической зависимости.
 type Config struct {
-	Logger LoggerConf
-	HTTP   HTTPConfig
+	Logger   LoggerConf
+	HTTP     HTTPConfig
+	LRUCache LRUCacheConfig
 }
 
 type LoggerConf struct {
@@ -18,6 +19,10 @@ type LoggerConf struct {
 type HTTPConfig struct {
 	Host string
 	Port string
+}
+
+type LRUCacheConfig struct {
+	Size int
 }
 
 func (c *Config) Read(fpath string) error {

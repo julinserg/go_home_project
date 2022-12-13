@@ -4,9 +4,13 @@ import (
 	"context"
 	"errors"
 	"net/http"
+
+	"github.com/julinserg/go_home_project/internal/app"
 )
 
-type Application interface{}
+type Application interface {
+	GetImagePreview(params app.InputParams, header http.Header) ([]byte, int, error)
+}
 
 type Server struct {
 	server   *http.Server
