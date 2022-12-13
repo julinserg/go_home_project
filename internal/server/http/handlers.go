@@ -77,7 +77,7 @@ func (ph *previewerHandler) mainHandler(w http.ResponseWriter, r *http.Request) 
 	if !isValid {
 		return
 	}
-	image, code, err := ph.app.GetImagePreview(params, r.Header)
+	image, code, isFromCache, err := ph.app.GetImagePreview(params, r.Header)
 	if err != nil {
 		if errors.Is(err, app.ErrFromRemoteServer) {
 			ph.proxyError(image, code, w)
@@ -86,6 +86,13 @@ func (ph *previewerHandler) mainHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
+	w.Header().Add("is-image-from-cache", strconv.FormatBool(isFromCache))
 	w.Write(image)
 	w.WriteHeader(http.StatusOK)
+}
+
+func (ph *previewerHandler) clearCacheHandler(w http.ResponseWriter, r *http.Request) {
+	ph.app.ClearCache()
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Clear cache is done!"))
 }

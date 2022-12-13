@@ -14,6 +14,7 @@ import (
 type previewerTest struct {
 	responseStatusCode int
 	responseBody       []byte
+	header             http.Header
 }
 
 func (test *previewerTest) iSendRequestTo(httpMethod, addr string) (err error) {
@@ -32,6 +33,7 @@ func (test *previewerTest) iSendRequestTo(httpMethod, addr string) (err error) {
 	}
 	test.responseStatusCode = r.StatusCode
 	test.responseBody, err = ioutil.ReadAll(r.Body)
+	test.header = r.Header
 
 	return
 }
@@ -73,6 +75,20 @@ func (test *previewerTest) compareWithImage(filePath string) error {
 	return nil
 }
 
+func (test *previewerTest) imageGetFromCache() error {
+	if test.header.Get("is-image-from-cache") != "true" {
+		return fmt.Errorf("is-image-from-cache: %s != true", test.header.Get("is-image-from-cache"))
+	}
+	return nil
+}
+
+func (test *previewerTest) imageGetFromRemoteServer() error {
+	if test.header.Get("is-image-from-cache") != "false" {
+		return fmt.Errorf("is-image-from-cache: %s != false", test.header.Get("is-image-from-cache"))
+	}
+	return nil
+}
+
 func InitializeScenario(s *godog.ScenarioContext) {
 	test := new(previewerTest)
 
@@ -80,5 +96,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^The response code should be (\d+)$`, test.theResponseCodeShouldBe)
 	s.Step(`^The response should match text "([^"]*)"$`, test.theResponseShouldMatchText)
 	s.Step(`^The response should match text$`, test.theResponseShouldMatchTextMultiLine)
-	s.Step(`^Compare with image "([^"]*)"$`, test.compareWithImage)
+	s.Step(`^The response equivalent image "([^"]*)"$`, test.compareWithImage)
+	s.Step(`^Image get from cache$`, test.imageGetFromCache)
+	s.Step(`^Image get from remote server$`, test.imageGetFromRemoteServer)
 }

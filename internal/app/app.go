@@ -118,30 +118,34 @@ func (a *App) readImageFromDisk(pathToFile string) ([]byte, error) {
 	return dat, nil
 }
 
-func (a *App) GetImagePreview(params InputParams, header http.Header) ([]byte, int, error) {
+func (a *App) GetImagePreview(params InputParams, header http.Header) ([]byte, int, bool, error) {
 	_, ok := a.cache.Get(params.key())
 	if ok {
 		image, err := a.readImageFromDisk(filepath.Join(a.tempCacheDir, string(params.key())))
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, http.StatusInternalServerError, false, err
 		}
-		return image, http.StatusOK, nil
+		return image, http.StatusOK, true, nil
 	}
 	image, code, err := a.getImageFromRemoteServer(params.ImageURL, header)
 	if err != nil {
-		return image, code, err
+		return image, code, false, err
 	}
 
 	imagePreview, err := a.cropAndResizeImage(image, params.Width, params.Height)
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, http.StatusInternalServerError, false, err
 	}
 	err = a.saveImageOnDisk(imagePreview, filepath.Join(a.tempCacheDir, string(params.key())))
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, http.StatusInternalServerError, false, err
 	}
 	a.cache.Set(params.key(), nil)
-	return imagePreview, http.StatusOK, nil
+	return imagePreview, http.StatusOK, false, nil
+}
+
+func (a *App) ClearCache() {
+	a.cache.Clear()
 }
 
 func New(logger Logger, cacheSize int, tempCacheDir string) *App {

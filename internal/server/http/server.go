@@ -10,7 +10,8 @@ import (
 )
 
 type Application interface {
-	GetImagePreview(params app.InputParams, header http.Header) ([]byte, int, error)
+	GetImagePreview(params app.InputParams, header http.Header) ([]byte, int, bool, error)
+	ClearCache()
 }
 
 type Server struct {
@@ -47,6 +48,7 @@ func NewServer(logger Logger, app Application, endpoint string) *Server {
 	ch := previewerHandler{logger, app}
 	mux.HandleFunc("/", ch.hellowHandler)
 	mux.HandleFunc("/fill/", ch.mainHandler)
+	mux.HandleFunc("/clearcache/", ch.clearCacheHandler)
 	return &Server{server, logger, endpoint}
 }
 
