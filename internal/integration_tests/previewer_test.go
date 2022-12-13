@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/cucumber/godog"
 )
@@ -55,7 +56,7 @@ func (test *previewerTest) theResponseShouldMatchText(text string) error {
 }
 
 func (test *previewerTest) theResponseShouldMatchTextMultiLine(text string) error {
-	if string(test.responseBody) != text {
+	if !strings.Contains(string(test.responseBody), text) {
 		return fmt.Errorf("unexpected text: %s != %s", test.responseBody, text)
 	}
 	return nil
@@ -97,7 +98,7 @@ func InitializeScenario(s *godog.ScenarioContext) {
 	s.Step(`^I send "([^"]*)" request to "([^"]*)"$`, test.iSendRequestTo)
 	s.Step(`^The response code should be (\d+)$`, test.theResponseCodeShouldBe)
 	s.Step(`^The response should match text "([^"]*)"$`, test.theResponseShouldMatchText)
-	s.Step(`^The response should match text$`, test.theResponseShouldMatchTextMultiLine)
+	s.Step(`^The response should contains text$`, test.theResponseShouldMatchTextMultiLine)
 	s.Step(`^The response equivalent image "([^"]*)"$`, test.compareWithImage)
 	s.Step(`^Image get from cache$`, test.imageGetFromCache)
 	s.Step(`^Image get from remote server$`, test.imageGetFromRemoteServer)
